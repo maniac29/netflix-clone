@@ -1,12 +1,21 @@
-import { useState,useRef } from "react";
+import { useState, useRef } from "react";
 import Header from "./Header";
 import { checkValidateData } from "../utils/validate";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword  } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { addUser } from "../utils/userSlice";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
-  const [errorMsg,setErrorrMsg] = useState(null);
+  const [errorMsg, setErrorrMsg] = useState(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const email = useRef(null);
   const pwd = useRef(null);
@@ -17,48 +26,71 @@ const Login = () => {
     setErrorrMsg("");
   };
   const handleButtonClick = () => {
-    if(!isSignInForm){
-        const isNameValid = !!name?.current?.value;
-        if(!isNameValid){
-            setErrorrMsg("Name is a mandatory field");
-            return;
-        }
+    if (!isSignInForm) {
+      const isNameValid = !!name?.current?.value;
+      if (!isNameValid) {
+        setErrorrMsg("Name is a mandatory field");
+        return;
+      }
     }
-    const errorMsg = checkValidateData(email?.current?.value,pwd?.current?.value,name?.current?.value);
+    const errorMsg = checkValidateData(
+      email?.current?.value,
+      pwd?.current?.value,
+      name?.current?.value
+    );
     setErrorrMsg(errorMsg);
-    if(!!errorMsg) return;
-    if(!isSignInForm){
+    if (!!errorMsg) return;
+    if (!isSignInForm) {
       //Sign UP logic
-      createUserWithEmailAndPassword(auth, email?.current?.value, pwd?.current?.value)
-  .then((userCredential) => {
-    // Signed up 
-    const user = userCredential.user;
-    console.log("USER--->",user);
-    // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    setErrorrMsg(errorCode + "-" + errorMessage)
-    // ..
-  });
-
-    }else{
+      createUserWithEmailAndPassword(
+        auth,
+        email?.current?.value,
+        pwd?.current?.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name?.current?.value, photoURL: "https://yt3.ggpht.com/yti/ANjgQV8kEukZIXerCWCeTQjjRouh-Yb6FKm4HqQT9wihX-_0xpU=s88-c-k-c0x00ffffff-no-rj"
+          }).then(() => {
+            // Profile updated!
+            // ...
+            const { uid, email, displayName,photoURL } = auth.currentUser;
+            dispatch(addUser({ uid: uid, email: email, displayName: displayName,photoURL:photoURL }));
+            navigate("/browse");
+          }).catch((error) => {
+            // An error occurred
+            // ...
+          });
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorrMsg(errorCode + "-" + errorMessage);
+          // ..
+        });
+    } else {
       //Sign IN Logic
-      signInWithEmailAndPassword(auth, email?.current?.value, pwd?.current?.value)
-      .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
-    console.log("USER--->",user);
-    // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    setErrorrMsg(errorCode + "-" + errorMessage)
-  });
+      signInWithEmailAndPassword(
+        auth,
+        email?.current?.value,
+        pwd?.current?.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log("USER--->", user);
+          navigate("/browse");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorrMsg(errorCode + "-" + errorMessage);
+        });
     }
-  }
+  };
 
   return (
     <div>
@@ -72,7 +104,9 @@ const Login = () => {
       </div>
       <form
         action=""
-        onSubmit={(e)=>{e.preventDefault()}}
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
         className="absolute w-3/12 h-4/6 my-52 mx-auto right-0 left-0 p-12 text-white rounded-xl bg-black bg-opacity-80"
       >
         <h1 className="font-bold text-5xl m-2 mb-10">
@@ -80,29 +114,31 @@ const Login = () => {
         </h1>
         {!isSignInForm ? (
           <input
-          ref={name}
+            ref={name}
             type="text"
             placeholder="Full Name"
             className="p-2 m-2 mb-5 w-full h-16 text-xl rounded-lg  bg-black opacity-80 border-white border-4 focus:outline-none focus:border-white focus:border-4 bg-opacity-80"
           />
         ) : null}
         <input
-        ref={email}
+          ref={email}
           type="text"
           placeholder="Email Address"
           className="p-2 m-2 mb-5 w-full h-16 text-xl rounded-lg  bg-black opacity-80 border-white border-4 focus:outline-none focus:border-white focus:border-4 bg-opacity-80"
         />
         <input
-        ref={pwd}
+          ref={pwd}
           type="password"
           placeholder="Password"
           className="p-2 m-2 mb-5 w-full h-16 text-xl rounded-lg  bg-black opacity-80 border-white border-4 focus:outline-none focus:border-white focus:border-4  bg-opacity-80"
         />
-        {
-            !!errorMsg ? 
-            <p className="w-full p-2 mb-5 text-red-700">{errorMsg}</p> : null
-        }
-        <button className="p-4 m-2 mb-10 w-full font-bold bg-red-700 rounded-lg text-lg" onClick={handleButtonClick}>
+        {!!errorMsg ? (
+          <p className="w-full p-2 mb-5 text-red-700">{errorMsg}</p>
+        ) : null}
+        <button
+          className="p-4 m-2 mb-10 w-full font-bold bg-red-700 rounded-lg text-lg"
+          onClick={handleButtonClick}
+        >
           {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
         {isSignInForm ? (

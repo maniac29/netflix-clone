@@ -1,7 +1,9 @@
+import Header from "./Header"
+
 const Browse = () => {
   return (
-    <div>
-      
+    <div className="w-full">
+      <Header/>
     </div>
   )
 }
