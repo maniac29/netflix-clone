@@ -20,7 +20,6 @@ const Header = () => {
       // An error happened.
     });
   }
-  console.log(user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
