@@ -57,7 +57,7 @@ const Login = () => {
             // ...
             const { uid, email, displayName,photoURL } = auth.currentUser;
             dispatch(addUser({ uid: uid, email: email, displayName: displayName,photoURL:photoURL }));
-            navigate("/browse");
+            //navigate("/browse");
           }).catch((error) => {
             // An error occurred
             // ...
@@ -81,7 +81,7 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log("USER--->", user);
-          navigate("/browse");
+          //navigate("/browse");
           // ...
         })
         .catch((error) => {
