@@ -33,7 +33,7 @@
     left: 100%; top: 0;
     height: 100%; width: 100%;
     border-radius: 999px;
-    background: none repeat scroll 0 0 #508EC3;
+    background: none repeat scroll 0 0 #b80a0a;
     opacity: 0.8;
     -webkit-animation: ui-spinner-rotate-left 3s infinite;
     animation: ui-spinner-rotate-left 3s infinite;

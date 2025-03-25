@@ -13,26 +13,28 @@ import { loadLoader } from "../utils/loaderSlice.js";
 const Browse = () => {
   const showGptScreen = useSelector((store) => store?.gpt?.showGptScreen);
   const showLoader = useSelector((store) => store?.loader?.showLoader);
+  const movies = useSelector((store) => store?.movies?.nowPlayingMovies);
+
   const dispatch = useDispatch();
-  dispatch(loadLoader(true));
+  //dispatch(loadLoader(true));
   useNowPlayingMovies();
   usePopularMovies();
   useTopRatedMovies();
   useUpcomingMovies();
-  dispatch(loadLoader(false));
+  //dispatch(loadLoader(false));
 
   return (
     <div className="w-screen overflow-x-hidden">
       <Header />
       {showGptScreen ? (
         <GptSeearch />
-      ) : showLoader ? (
-        <Loader />
-      ) : (
+      ) : movies !== null ? (
         <>
           <MainContainer />
           <SecondaryContainer />
         </>
+      ) : (
+        <Loader />
       )}
     </div>
   );
