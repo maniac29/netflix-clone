@@ -8,12 +8,17 @@ const useNowPlayingMovies = () =>{
     const dispatch = useDispatch();
 
     const getNowPlayingMovies = async () => {
-      const res = await fetch("https://api.themoviedb.org/3/movie/now_playing?language=en-US",GET_API_OPTIONS);
-      if(res?.status !== 200){
+      
+      try {
+        const res = await fetch("https://api.themoviedb.org/3/movie/now_playing?language=en-US",GET_API_OPTIONS);
+        if(res?.status !== 200){
+          dispatch(addNowPlayingMovies(dataNowPlayingMovies?.results));
+        }else{
+          const json = await res?.json();
+          dispatch(addNowPlayingMovies(json?.results));
+        }
+      } catch (error) {
         dispatch(addNowPlayingMovies(dataNowPlayingMovies?.results));
-      }else{
-        const json = await res?.json();
-        dispatch(addNowPlayingMovies(json?.results));
       }
     }
   

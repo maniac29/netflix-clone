@@ -4,22 +4,29 @@ import { useEffect } from "react";
 import { addTopRatedMovies } from "../utils/movieSlice";
 import { dataTopRated } from "../data/dataTopRated";
 
-const useTopRatedMovies = () =>{
-    const dispatch = useDispatch();
+const useTopRatedMovies = () => {
+  const dispatch = useDispatch();
 
-    const getTopRatedMovies = async () => {
-      const res = await fetch("https://api.themoviedb.org/3/movie/top_rated",GET_API_OPTIONS);
-      if(res?.status !== 200){
+  const getTopRatedMovies = async () => {
+    try {
+      const res = await fetch(
+        "https://api.themoviedb.org/3/movie/top_rated",
+        GET_API_OPTIONS
+      );
+      if (res?.status !== 200) {
         dispatch(addTopRatedMovies(dataTopRated?.results));
-      }else{
+      } else {
         const json = await res?.json();
         dispatch(addTopRatedMovies(json?.results));
       }
+    } catch (error) {
+      dispatch(addTopRatedMovies(dataTopRated?.results));
     }
-  
-    useEffect(()=>{
-        getTopRatedMovies();
-    },[])
+  };
+
+  useEffect(() => {
+    getTopRatedMovies();
+  }, []);
 };
 
 export default useTopRatedMovies;
